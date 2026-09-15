@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="it"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111111"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="EDO FIT">
+<link rel="manifest" href="manifest.json"><title>EDO FIT</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f3f3f3;color:#111;padding-bottom:86px}
+header{background:#111;color:#fff;padding:24px 18px 18px;border-radius:0 0 24px 24px}.brand{font-size:25px;font-weight:850}.sub{opacity:.72;margin-top:4px}
+main{max-width:720px;margin:auto;padding:15px}.card{background:#fff;border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 2px 12px #0001}
+h2{margin:0 0 10px;font-size:20px}.muted{color:#666;font-size:14px}.hero{font-size:34px;font-weight:850}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:#f0f0f0;border-radius:14px;padding:12px}.stat b{display:block;font-size:20px;margin-top:3px}
+button{border:0;border-radius:12px;padding:12px 14px;font-size:15px;font-weight:750;background:#111;color:#fff}.secondary{background:#e9e9e9;color:#111}.big{width:100%;margin-top:8px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.pill{display:inline-block;background:#eee;padding:6px 9px;border-radius:99px;font-size:12px;font-weight:750}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ddd;display:flex;justify-content:center;gap:2px;padding:8px 5px calc(8px + env(safe-area-inset-bottom));z-index:5}
+nav button{background:transparent;color:#555;font-size:11px;padding:8px 9px}nav button.active{background:#111;color:#fff}.hidden{display:none}
+.exercise{padding:12px 0;border-bottom:1px solid #eee}.exercise:last-child{border:0}.check{width:24px;height:24px}
+.progress{height:10px;background:#ddd;border-radius:20px;overflow:hidden}.bar{height:100%;background:#111;width:0}.timer{font-size:48px;font-weight:850;text-align:center;margin:15px 0}
+input,select{padding:11px;border:1px solid #ccc;border-radius:10px;font-size:16px;background:#fff}.weekbtn{margin:3px}.selected{background:#555}
+ul{padding-left:22px}li{margin:8px 0}.note{font-size:12px;color:#666}
+</style></head><body>
+<header><div class="brand">🏉 EDO FIT</div><div class="sub">Ritorno in forma • 8 settimane</div></header>
+<main>
+<section id="home"><div class="card"><div class="muted">Peso</div><div class="hero" id="weightHero">113 kg</div><div class="muted">Obiettivo iniziale: 108 kg</div><div class="progress"><div id="bar" class="bar"></div></div></div>
+<div class="card"><h2>Allenamento di oggi</h2><div id="today"></div><button class="big" onclick="show('workout')">Apri allenamento</button></div>
+<div class="grid"><div class="stat">Settimana<b id="weekStat">1 / 8</b></div><div class="stat">Sessioni<b id="doneCount">0 / 6</b></div></div></section>
+
+<section id="workout" class="hidden"><div class="card"><h2>Programma</h2><div id="weekButtons"></div><div id="workoutList"></div></div>
+<div class="card"><h2>⏱️ Timer recupero</h2><div class="timer" id="timer">01:00</div><div class="row"><button onclick="startTimer()">START</button><button class="secondary" onclick="resetTimer()">RESET</button></div></div></section>
+
+<section id="food" class="hidden"><div class="card"><h2>🍽️ Alimentazione</h2><p class="muted">Base alimentare da mantenere per tutte le 8 settimane; le quantità possono essere adattate in base all'andamento del peso e alla fame.</p>
+<ul><li><b>Colazione:</b> 150 g yogurt greco + 30 g granola + 1 frutto + caffè.</li><li><b>Spuntino:</b> 1 frutto + circa 15 g mandorle/noci.</li><li><b>Pranzo:</b> 100 g riso a crudo + 200 g macinato di pollo/manzo magro + verdure + 10 g olio EVO.</li><li><b>Merenda/pre-allenamento:</b> proteine + 1 banana.</li><li><b>Cena:</b> 200 g carne/pesce + 70–100 g pane oppure polenta + verdure + frutto + 10 g olio EVO.</li></ul></div>
+<div class="card"><h2>💧 Regole semplici</h2><ul><li>Idratati regolarmente.</li><li>Non eliminare i carboidrati.</li><li>Preferisci frutto intero alla spremuta nella maggior parte dei giorni.</li><li>Il deficit calorico va verificato sulla media del peso, non sul singolo giorno.</li></ul></div></section>
+
+<section id="weight" class="hidden"><div class="card"><h2>⚖️ Diario peso</h2><div class="row"><input id="weightInput" type="number" step=".1" placeholder="es. 112.5"><button onclick="saveWeight()">Salva</button></div><div id="history" style="margin-top:15px"></div></div></section>
+
+<section id="info" class="hidden"><div class="card"><h2>📈 Progressione 8 settimane</h2><div id="progression"></div></div><div class="card"><h2>⚠️ Sicurezza</h2><p class="note">Programma generale. Dopo mesi di stop, aumenta gradualmente. Per ora niente corsa, salti, burpees o sprint. Se compare dolore importante o persistente, interrompi l'esercizio e confrontati con un professionista sanitario.</p></div></section>
+</main>
+<nav><button onclick="show('home')" id="n-home">🏠<br>Home</button><button onclick="show('workout')" id="n-workout">💪<br>Allenamento</button><button onclick="show('food')" id="n-food">🍽️<br>Pasti</button><button onclick="show('weight')" id="n-weight">⚖️<br>Peso</button><button onclick="show('info')" id="n-info">📈<br>8 settimane</button></nav>
+<script>
+const days=["Domenica","Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato"];
+const base={
+"Forza A":[["Squat","3×10–12"],["Push-up","3×6–12"],["Affondi posteriori","3×8/gamba"],["Rematore con zaino","3×10–15"],["Ponte glutei","3×15"],["Plank","3×20–40 s"]],
+"Forza B":[["Squat con pausa","3×8–10"],["Push-up","3×6–12"],["Stacco rumeno con zaino","3×10–15"],["Bulgarian split squat","2×8/gamba"],["Rematore con zaino","3×10–15"],["Side plank","2×20–30 s/lato"]]
+};
+function planForWeek(w){
+let mult=w<=2?0:w<=4?1:w<=6?2:3;
+let A=base["Forza A"].map(x=>[x[0],x[1]]);
+let B=base["Forza B"].map(x=>[x[0],x[1]]);
+if(mult===1){A=A.map(x=>[x[0],x[1].replace("3×","4×")]);B=B.map(x=>[x[0],x[1].replace("3×","4×")]);}
+if(mult>=2){A=A.map(x=>[x[0],x[1].replace("3×","4×")]);B=B.map(x=>[x[0],x[1].replace("3×","4×")]);}
+if(mult===3){A.push(["Dead bug","3×10/lato"]);B.push(["Bird dog","3×10/lato"]);}
+let cardio=w<=2?[["5' facile",""],["25' moderato",""],["5' facile",""]]:
+w<=4?[["5' facile",""],["30' moderato",""],["5' facile",""]]:
+w<=6?[["5' facile",""],["35' moderato",""],["5' facile",""]]:
+[["5' facile",""],["40' moderato",""],["5' facile",""]];
+let intervals=w<=2?"8 × (1' sostenuto + 2' facile)":w<=4?"9 × (1' sostenuto + 2' facile)":w<=6?"10 × (1' sostenuto + 2' facile)":"8 × (2' sostenuto + 2' facile)";
+return {
+"Lunedì":["Forza A",...A], "Martedì":["Cyclette aerobica",...cardio],
+"Mercoledì":["Forza B",...B], "Giovedì":["Cyclette intervalli",["5' riscaldamento",""],[intervals,""],["5–6' defaticamento",""]],
+"Venerdì":["Forza A",...A], "Sabato":["Cyclette tranquilla",[[w<=2?"45'":"50–60'","ritmo facile/moderato"]]], "Domenica":["Recupero",[["Passeggiata 30–40'","oppure riposo"]]]
+};}
+let week=parseInt(localStorage.getItem("week")||"1");
+function currentDay(){return days[new Date().getDay()]}
+function render(){
+document.getElementById("weekStat").textContent=week+" / 8";
+let p=planForWeek(week),d=currentDay(),t=p[d];
+document.getElementById("today").innerHTML=`<span class="pill">${d}</span><h3>${t[0]}</h3>${t.slice(1).map(x=>"• "+x[0]+(x[1]?" — "+x[1]:"")).join("<br>")}`;
+document.getElementById("weekButtons").innerHTML=Array.from({length:8},(_,i)=>`<button class="weekbtn ${week===i+1?"selected":""}" onclick="setWeek(${i+1})">S${i+1}</button>`).join("");
+document.getElementById("workoutList").innerHTML=Object.entries(p).map(([day,a])=>`<div class="exercise"><div class="row"><b>${day}</b>${day!=="Domenica"?`<input type="checkbox" class="check" ${localStorage.getItem("done-"+week+"-"+day)?"checked":""} onchange="done('${day}',this.checked)">`:""}</div><div class="muted">${a.slice(1).map(x=>x[0]+(x[1]?" — "+x[1]:"")).join(" • ")}</div></div>`).join("");
+let doneN=Object.keys(p).filter(x=>x!=="Domenica"&&localStorage.getItem("done-"+week+"-"+x)).length;
+document.getElementById("doneCount").textContent=doneN+" / 6";
+let ws=JSON.parse(localStorage.getItem("weights")||"[]"),last=ws.length?ws[ws.length-1].v:113;
+document.getElementById("weightHero").textContent=last+" kg";document.getElementById("bar").style.width=Math.max(0,Math.min(100,(113-last)/5*100))+"%";
+document.getElementById("history").innerHTML=ws.length?"<b>Storico</b><br>"+ws.slice().reverse().map(x=>x.d+" — "+x.v+" kg").join("<br>"):"Nessuna pesata salvata.";
+document.getElementById("progression").innerHTML=[1,2,3,4,5,6,7,8].map(w=>`<p><b>Settimana ${w}</b> — ${w<=2?"ripartenza e tecnica":w<=4?"aumento volume":w<=6?"condizionamento": "consolidamento"} • Forza 3×/settimana • Cyclette 3×/settimana</p>`).join("");
+}
+function setWeek(w){week=w;localStorage.setItem("week",w);render()}
+function done(d,v){localStorage.setItem("done-"+week+"-"+d,v?"1":"");render()}
+function saveWeight(){let v=parseFloat(document.getElementById("weightInput").value);if(!v)return;let w=JSON.parse(localStorage.getItem("weights")||"[]");w.push({d:new Date().toLocaleDateString("it-IT"),v:v});localStorage.setItem("weights",JSON.stringify(w));document.getElementById("weightInput").value="";render()}
+function show(id){document.querySelectorAll("section").forEach(s=>s.classList.add("hidden"));document.getElementById(id).classList.remove("hidden");document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));document.getElementById("n-"+id).classList.add("active");render()}
+let sec=60,interval=null;function draw(){document.getElementById("timer").textContent=String(Math.floor(sec/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0")}function startTimer(){if(interval)return;interval=setInterval(()=>{sec--;draw();if(sec<=0){clearInterval(interval);interval=null;navigator.vibrate?.([200,100,200])}},1000)}function resetTimer(){clearInterval(interval);interval=null;sec=60;draw()}
+show("home");
+</script></body></html>
